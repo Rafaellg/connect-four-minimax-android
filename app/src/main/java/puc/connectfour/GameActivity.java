@@ -23,6 +23,8 @@ public class GameActivity extends AppCompatActivity {
     private Button btn61, btn62, btn63, btn64, btn65, btn66, btn67;
     private Button[][] boardBtn = new Button[6][7];
 
+    public static GameActivity instance = new GameActivity();
+
     // Posicao inicial default
     private int posCabecalho = 3;
     // Player do momento atual
@@ -58,6 +60,10 @@ public class GameActivity extends AppCompatActivity {
         btnLeft.setVisibility(View.GONE);
         btnRight.setVisibility(View.GONE);
         btnDown.setVisibility(View.GONE);
+    }
+
+    public static GameActivity getInstance() {
+        return instance;
     }
 
     public void initializeBoard() {
@@ -176,46 +182,22 @@ public class GameActivity extends AppCompatActivity {
             // ++ apenas para anular o -- no final
             posCabecalho++;
         } else if (posCabecalho == 1) {
-            if (playerAtual == 1) {
-                img1.setBackground(bgRed);
-            } else {
-                img1.setBackground(bgYellow);
-            }
+            img1.setBackground(bgRed);
             img2.setBackgroundColor(getResources().getColor(R.color.colorTransparent));
         } else if (posCabecalho == 2) {
-            if (playerAtual == 1) {
-                img2.setBackground(bgRed);
-            } else {
-                img2.setBackground(bgYellow);
-            }
+            img2.setBackground(bgRed);
             img3.setBackgroundColor(getResources().getColor(R.color.colorTransparent));
         } else if (posCabecalho == 3) {
-            if (playerAtual == 1) {
-                img3.setBackground(bgRed);
-            } else {
-                img3.setBackground(bgYellow);
-            }
+            img3.setBackground(bgRed);
             img4.setBackgroundColor(getResources().getColor(R.color.colorTransparent));
         } else if (posCabecalho == 4) {
-            if (playerAtual == 1) {
-                img4.setBackground(bgRed);
-            } else {
-                img4.setBackground(bgYellow);
-            }
+            img4.setBackground(bgRed);
             img5.setBackgroundColor(getResources().getColor(R.color.colorTransparent));
         } else if (posCabecalho == 5) {
-            if (playerAtual == 1) {
-                img5.setBackground(bgRed);
-            } else {
-                img5.setBackground(bgYellow);
-            }
+            img5.setBackground(bgRed);
             img6.setBackgroundColor(getResources().getColor(R.color.colorTransparent));
         } else if (posCabecalho == 6) {
-            if (playerAtual == 1) {
-                img6.setBackground(bgRed);
-            } else {
-                img6.setBackground(bgYellow);
-            }
+            img6.setBackground(bgRed);
             img7.setBackgroundColor(getResources().getColor(R.color.colorTransparent));
         }
 
@@ -225,46 +207,22 @@ public class GameActivity extends AppCompatActivity {
 
     public void moveRight() {
         if (posCabecalho == 0) {
-            if (playerAtual == 1) {
-                img2.setBackground(bgRed);
-            } else {
-                img2.setBackground(bgYellow);
-            }
+            img2.setBackground(bgRed);
             img1.setBackgroundColor(getResources().getColor(R.color.colorTransparent));
         } else if (posCabecalho == 1) {
-            if (playerAtual == 1) {
-                img3.setBackground(bgRed);
-            } else {
-                img3.setBackground(bgYellow);
-            }
+            img3.setBackground(bgRed);
             img2.setBackgroundColor(getResources().getColor(R.color.colorTransparent));
         } else if (posCabecalho == 2) {
-            if (playerAtual == 1) {
-                img4.setBackground(bgRed);
-            } else {
-                img4.setBackground(bgYellow);
-            }
+            img4.setBackground(bgRed);
             img3.setBackgroundColor(getResources().getColor(R.color.colorTransparent));
         } else if (posCabecalho == 3) {
-            if (playerAtual == 1) {
-                img5.setBackground(bgRed);
-            } else {
-                img5.setBackground(bgYellow);
-            }
+            img5.setBackground(bgRed);
             img4.setBackgroundColor(getResources().getColor(R.color.colorTransparent));
         } else if (posCabecalho == 4) {
-            if (playerAtual == 1) {
-                img6.setBackground(bgRed);
-            } else {
-                img6.setBackground(bgYellow);
-            }
+            img6.setBackground(bgRed);
             img5.setBackgroundColor(getResources().getColor(R.color.colorTransparent));
         } else if (posCabecalho == 5) {
-            if (playerAtual == 1) {
-                img7.setBackground(bgRed);
-            } else {
-                img7.setBackground(bgYellow);
-            }
+            img7.setBackground(bgRed);
             img6.setBackgroundColor(getResources().getColor(R.color.colorTransparent));
         } else if (posCabecalho == 6) {
             // Nao se move pois esta na margem
@@ -295,47 +253,19 @@ public class GameActivity extends AppCompatActivity {
         if (edit) {
             // Atualiza o botao do cabecalho
             if (posCabecalho == 0) {
-                if (playerAtual == 1) {
-                    img1.setBackground(bgRed);
-                } else {
-                    img1.setBackground(bgYellow);
-                }
+                img1.setBackground(bgRed);
             } else if (posCabecalho == 1) {
-                if (playerAtual == 1) {
-                    img2.setBackground(bgRed);
-                } else {
-                    img2.setBackground(bgYellow);
-                }
+                img2.setBackground(bgRed);
             } else if (posCabecalho == 2) {
-                if (playerAtual == 1) {
-                    img3.setBackground(bgRed);
-                } else {
-                    img3.setBackground(bgYellow);
-                }
+                img3.setBackground(bgRed);
             } else if (posCabecalho == 3) {
-                if (playerAtual == 1) {
-                    img4.setBackground(bgRed);
-                } else {
-                    img4.setBackground(bgYellow);
-                }
+                img4.setBackground(bgRed);
             } else if (posCabecalho == 4) {
-                if (playerAtual == 1) {
-                    img5.setBackground(bgRed);
-                } else {
-                    img5.setBackground(bgYellow);
-                }
+                img5.setBackground(bgRed);
             } else if (posCabecalho == 5) {
-                if (playerAtual == 1) {
-                    img6.setBackground(bgRed);
-                } else {
-                    img6.setBackground(bgYellow);
-                }
+                img6.setBackground(bgRed);
             } else if (posCabecalho == 6) {
-                if (playerAtual == 1) {
-                    img7.setBackground(bgRed);
-                } else {
-                    img7.setBackground(bgYellow);
-                }
+                img7.setBackground(bgRed);
             }
 
             // Atualiza o tabuleiro
@@ -402,11 +332,20 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 moveDown();
+                minimaxPlay();
             }
         });
 
         initializeBoard();
         showBoard();
+    }
+
+    public void minimaxPlay() {
+        // 4 estava na classe importada
+        int[][] newBoard = board.clone();
+        Minimax comp = new Minimax(newBoard,4, this);
+        int c = comp.calcValue();
+        drop(c);
     }
 
     public void linkScreenElements() {
@@ -535,5 +474,27 @@ public class GameActivity extends AppCompatActivity {
             }
         }
         return win;
+    }
+
+    public void setGrid(int[][] board) {
+        this.board = board;
+    }
+
+    public int drop(int col) {
+        int posCabecalhoOld = posCabecalho;
+        posCabecalho = col;
+
+        moveDown();
+
+        posCabecalho = posCabecalhoOld;
+        if (win()) {
+            return -1;
+        }
+
+        return 0;
+    }
+
+    public int getPlayer() {
+        return playerAtual;
     }
 }
