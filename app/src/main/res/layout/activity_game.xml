@@ -11,6 +11,15 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".GameActivity">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/txtWinner"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="20dp"
+        android:visibility="gone" />
+
     <GridLayout
         android:id="@+id/layoutCabecalho"
         android:layout_width="wrap_content"
@@ -485,7 +494,7 @@
 
         <LinearLayout
             android:id="@+id/layoutActions"
-            android:layout_width="295dp"
+            android:layout_width="312dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:layout_marginTop="20dp"
@@ -495,7 +504,7 @@
             <ImageButton
                 android:id="@+id/btnLeft"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
                 android:layout_weight="1"
                 android:backgroundTint="@color/colorPrimary"
                 android:src="@drawable/ic_arrow_back_black_24dp"
@@ -504,9 +513,9 @@
             <ImageButton
                 android:id="@+id/btnDown"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/colorBlueDark"
+                android:backgroundTint="@color/colorRed"
                 android:foregroundTint="@color/colorPrimary"
                 android:src="@drawable/ic_arrow_downward_black_24dp"
                 android:tint="#ffffff" />
@@ -514,7 +523,7 @@
             <ImageButton
                 android:id="@+id/btnRight"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
                 android:layout_weight="1"
                 android:backgroundTint="@color/colorPrimary"
                 android:foregroundTint="@color/colorPrimary"
@@ -522,13 +531,30 @@
                 android:tint="#ffffff" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btnStart"
-            android:layout_width="295dp"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/colorAccent"
-            android:text="Começar"
-            android:textColor="#ffffff" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="312dp"
+            android:layout_height="match_parent"
+            android:id="@+id/layoutAlgo">
+
+            <Button
+                android:id="@+id/btnMinimax"
+                android:layout_width="295dp"
+                android:layout_height="60dp"
+                android:backgroundTint="@color/colorAccent"
+                android:text="Minimax"
+                android:textColor="#ffffff"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/btnMinimaxAlfaBeta"
+                android:layout_width="295dp"
+                android:layout_height="60dp"
+                android:backgroundTint="@color/colorAccent"
+                android:text="Alfa-Beta"
+                android:textColor="#ffffff"
+                android:layout_weight="1" />
+        </LinearLayout>
 
     </LinearLayout>
 

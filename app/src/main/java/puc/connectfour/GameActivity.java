@@ -7,40 +7,46 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class GameActivity extends AppCompatActivity {
 
-    private Drawable bgEmpty, bgRed, bgYellow;
+    // Elementos da tela
+    private TextView txtWinner;
+    private Drawable bgEmpty, bgRed, bgYellow, bgRedDark, bgYellowDark;
     private ImageView img1, img2, img3, img4, img5, img6, img7;
     private ImageButton btnLeft, btnDown, btnRight;
-    private Button btnStart;
+    private Button btnMinimax, btnMinimaxAlfaBeta;
     private Button btn11, btn12, btn13, btn14, btn15, btn16, btn17;
     private Button btn21, btn22, btn23, btn24, btn25, btn26, btn27;
     private Button btn31, btn32, btn33, btn34, btn35, btn36, btn37;
     private Button btn41, btn42, btn43, btn44, btn45, btn46, btn47;
     private Button btn51, btn52, btn53, btn54, btn55, btn56, btn57;
     private Button btn61, btn62, btn63, btn64, btn65, btn66, btn67;
-    private Button[][] boardBtn = new Button[6][7];
-
-    public static GameActivity instance = new GameActivity();
 
     // Posicao inicial default
     private int posCabecalho = 3;
     // Player do momento atual
     private int playerAtual = 1;
-    // Matriz do tabuleiro
-    private int[][] board = new int[6][7];
+    // Matriz do tabuleiro e do botao
+    private int[][] board = new int[7][6];
+    private Button[][] boardBtn = new Button[7][6];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_game);
+
+        // Esconde action bar
+        getSupportActionBar().hide();
 
         // Define os 3 layouts para controle
         bgEmpty = getDrawable(R.drawable.bg_circle_empty);
         bgRed = getDrawable(R.drawable.bg_circle_red);
         bgYellow = getDrawable(R.drawable.bg_circle_yellow);
+        bgRedDark = getDrawable(R.drawable.bg_circle_red_stroke);
+        bgYellowDark = getDrawable(R.drawable.bg_circle_yellow_stroke);
 
         // Linka os elementos da tela com o Java
         linkScreenElements();
@@ -49,10 +55,16 @@ public class GameActivity extends AppCompatActivity {
         initializeBoard();
 
         // Acao dos botoes
-        btnStart.setOnClickListener(new View.OnClickListener() {
+        btnMinimax.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startGame();
+                startGame(false);
+            }
+        });
+        btnMinimaxAlfaBeta.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startGame(true);
             }
         });
 
@@ -62,67 +74,66 @@ public class GameActivity extends AppCompatActivity {
         btnDown.setVisibility(View.GONE);
     }
 
-    public static GameActivity getInstance() {
-        return instance;
-    }
-
     public void initializeBoard() {
+        // Define jogador atual
+        playerAtual = 1;
+
         // Matriz de player
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 7; j++) {
+        for (int i = 0; i < 7; i++) {
+            for (int j = 0; j < 6; j++) {
                 board[i][j] = 0;
             }
         }
 
         // Matriz de botoes
         boardBtn[0][0] = btn11;
-        boardBtn[1][0] = btn21;
-        boardBtn[2][0] = btn31;
-        boardBtn[3][0] = btn41;
-        boardBtn[4][0] = btn51;
-        boardBtn[5][0] = btn61;
+        boardBtn[0][1] = btn21;
+        boardBtn[0][2] = btn31;
+        boardBtn[0][3] = btn41;
+        boardBtn[0][4] = btn51;
+        boardBtn[0][5] = btn61;
 
-        boardBtn[0][1] = btn12;
+        boardBtn[1][0] = btn12;
         boardBtn[1][1] = btn22;
-        boardBtn[2][1] = btn32;
-        boardBtn[3][1] = btn42;
-        boardBtn[4][1] = btn52;
-        boardBtn[5][1] = btn62;
+        boardBtn[1][2] = btn32;
+        boardBtn[1][3] = btn42;
+        boardBtn[1][4] = btn52;
+        boardBtn[1][5] = btn62;
 
-        boardBtn[0][2] = btn13;
-        boardBtn[1][2] = btn23;
+        boardBtn[2][0] = btn13;
+        boardBtn[2][1] = btn23;
         boardBtn[2][2] = btn33;
-        boardBtn[3][2] = btn43;
-        boardBtn[4][2] = btn53;
-        boardBtn[5][2] = btn63;
+        boardBtn[2][3] = btn43;
+        boardBtn[2][4] = btn53;
+        boardBtn[2][5] = btn63;
 
-        boardBtn[0][3] = btn14;
-        boardBtn[1][3] = btn24;
-        boardBtn[2][3] = btn34;
+        boardBtn[3][0] = btn14;
+        boardBtn[3][1] = btn24;
+        boardBtn[3][2] = btn34;
         boardBtn[3][3] = btn44;
-        boardBtn[4][3] = btn54;
-        boardBtn[5][3] = btn64;
+        boardBtn[3][4] = btn54;
+        boardBtn[3][5] = btn64;
 
-        boardBtn[0][4] = btn15;
-        boardBtn[1][4] = btn25;
-        boardBtn[2][4] = btn35;
-        boardBtn[3][4] = btn45;
+        boardBtn[4][0] = btn15;
+        boardBtn[4][1] = btn25;
+        boardBtn[4][2] = btn35;
+        boardBtn[4][3] = btn45;
         boardBtn[4][4] = btn55;
-        boardBtn[5][4] = btn65;
+        boardBtn[4][5] = btn65;
 
-        boardBtn[0][5] = btn16;
-        boardBtn[1][5] = btn26;
-        boardBtn[2][5] = btn36;
-        boardBtn[3][5] = btn46;
-        boardBtn[4][5] = btn56;
+        boardBtn[5][0] = btn16;
+        boardBtn[5][1] = btn26;
+        boardBtn[5][2] = btn36;
+        boardBtn[5][3] = btn46;
+        boardBtn[5][4] = btn56;
         boardBtn[5][5] = btn66;
 
-        boardBtn[0][6] = btn17;
-        boardBtn[1][6] = btn27;
-        boardBtn[2][6] = btn37;
-        boardBtn[3][6] = btn47;
-        boardBtn[4][6] = btn57;
-        boardBtn[5][6] = btn67;
+        boardBtn[6][0] = btn17;
+        boardBtn[6][1] = btn27;
+        boardBtn[6][2] = btn37;
+        boardBtn[6][3] = btn47;
+        boardBtn[6][4] = btn57;
+        boardBtn[6][5] = btn67;
 
         // Limpa as cores dos botoes;
         // ---Tabuleiro
@@ -234,12 +245,12 @@ public class GameActivity extends AppCompatActivity {
         posCabecalho++;
     }
 
-    public void moveDown() {
+    public boolean moveDown() {
         boolean edit = false;
 
         for (int i = 5; i >= 0; i--) {
-            if (board[i][posCabecalho] == 0) {
-                board[i][posCabecalho] = playerAtual;
+            if (board[posCabecalho][i] == 0) {
+                board[posCabecalho][i] = playerAtual;
 
                 // Marca que ocorreu uma edicao
                 edit = true;
@@ -251,23 +262,6 @@ public class GameActivity extends AppCompatActivity {
 
         // Verifica se aconteceu alguma alteracao
         if (edit) {
-            // Atualiza o botao do cabecalho
-            if (posCabecalho == 0) {
-                img1.setBackground(bgRed);
-            } else if (posCabecalho == 1) {
-                img2.setBackground(bgRed);
-            } else if (posCabecalho == 2) {
-                img3.setBackground(bgRed);
-            } else if (posCabecalho == 3) {
-                img4.setBackground(bgRed);
-            } else if (posCabecalho == 4) {
-                img5.setBackground(bgRed);
-            } else if (posCabecalho == 5) {
-                img6.setBackground(bgRed);
-            } else if (posCabecalho == 6) {
-                img7.setBackground(bgRed);
-            }
-
             // Atualiza o tabuleiro
             showBoard();
 
@@ -277,29 +271,33 @@ public class GameActivity extends AppCompatActivity {
                 btnRight.setOnClickListener(null);
                 btnDown.setOnClickListener(null);
 
-                btnStart.setVisibility(View.VISIBLE);
+                btnMinimax.setVisibility(View.VISIBLE);
+                btnMinimaxAlfaBeta.setVisibility(View.VISIBLE);
+                txtWinner.setVisibility(View.VISIBLE);
 
                 btnLeft.setVisibility(View.GONE);
                 btnRight.setVisibility(View.GONE);
                 btnDown.setVisibility(View.GONE);
 
                 if (playerAtual == 1) {
-                    Toast.makeText(this, "Vermelho venceu!", Toast.LENGTH_SHORT).show();
+                    txtWinner.setText("O jogador vermelho venceu!");
                 } else {
-                    Toast.makeText(this, "Amarelo venceu!", Toast.LENGTH_SHORT).show();
+                    txtWinner.setText("O jogador amarelo venceu!");
                 }
             }
 
             // Troca o jogador atual
             playerAtual = (playerAtual%2)+1;
+            return true;
         } else {
             Toast.makeText(this, "Coluna cheia!", Toast.LENGTH_SHORT).show();
+            return false;
         }
     }
 
     public void showBoard() {
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 7; j++) {
+        for (int i = 0; i < 7; i++) {
+            for (int j = 0; j < 6; j++) {
                 if (board[i][j] == 1) {
                     boardBtn[i][j].setBackground(bgRed);
                 } else if (board[i][j] == 2) {
@@ -309,8 +307,10 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    public void startGame() {
-        btnStart.setVisibility(View.GONE);
+    public void startGame(final boolean alfaBeta) {
+        btnMinimax.setVisibility(View.GONE);
+        btnMinimaxAlfaBeta.setVisibility(View.GONE);
+        txtWinner.setVisibility(View.GONE);
 
         btnLeft.setVisibility(View.VISIBLE);
         btnRight.setVisibility(View.VISIBLE);
@@ -331,8 +331,17 @@ public class GameActivity extends AppCompatActivity {
         btnDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                moveDown();
-                minimaxPlay();
+                // Faz o movimento do player 1
+                boolean success = moveDown();
+
+                // Faz o movimento do minimax
+                if (success){
+                    if (alfaBeta) {
+                        minimaxAlfaBetaPlay();
+                    } else {
+                        minimaxPlay();
+                    }
+                }
             }
         });
 
@@ -341,9 +350,15 @@ public class GameActivity extends AppCompatActivity {
     }
 
     public void minimaxPlay() {
-        // 4 estava na classe importada
         int[][] newBoard = board.clone();
-        Minimax comp = new Minimax(newBoard,4, this);
+        Minimax comp = new Minimax(newBoard,4);
+        int c = comp.calcValue();
+        drop(c);
+    }
+
+    public void minimaxAlfaBetaPlay() {
+        int[][] newBoard = board.clone();
+        MinimaxAlfaBeta comp = new MinimaxAlfaBeta(newBoard,4);
         int c = comp.calcValue();
         drop(c);
     }
@@ -353,7 +368,11 @@ public class GameActivity extends AppCompatActivity {
         btnLeft = (ImageButton) findViewById(R.id.btnLeft);
         btnDown = (ImageButton) findViewById(R.id.btnDown);
         btnRight = (ImageButton) findViewById(R.id.btnRight);
-        btnStart = (Button) findViewById(R.id.btnStart);
+        btnMinimax = (Button) findViewById(R.id.btnMinimax);
+        btnMinimaxAlfaBeta = (Button) findViewById(R.id.btnMinimaxAlfaBeta);
+
+        // TextView de ganhador
+        txtWinner = (TextView) findViewById(R.id.txtWinner);
 
         // Cabecalho
         img1 = (ImageView) findViewById(R.id.img1);
@@ -422,12 +441,25 @@ public class GameActivity extends AppCompatActivity {
         {
             for (int col = 0;col<4;col++)
             {
-                if (board[row][col] != 0 &&
-                        board[row][col] == board[row][col+1] &&
-                        board[row][col] == board[row][col+2] &&
-                        board[row][col] == board[row][col+3])
+                if (board[col][row] != 0 &&
+                        board[col][row] == board[col+1][row] &&
+                        board[col][row] == board[col+2][row] &&
+                        board[col][row] == board[col+3][row])
                 {
                     win = true;
+
+                    // Marca a vitoria
+                    Drawable bgWin;
+                    if (board[col][row] == 1) {
+                        bgWin = bgRedDark;
+                    } else {
+                        bgWin = bgYellowDark;
+                    }
+
+                    boardBtn[col][row].setBackground(bgWin);
+                    boardBtn[col+1][row].setBackground(bgWin);
+                    boardBtn[col+2][row].setBackground(bgWin);
+                    boardBtn[col+3][row].setBackground(bgWin);
                 }
             }
         }
@@ -436,12 +468,25 @@ public class GameActivity extends AppCompatActivity {
         {
             for (int col = 0;col<7;col++)
             {
-                if (board[row][col] != 0 &&
-                        board[row][col] == board[row+1][col] &&
-                        board[row][col] == board[row+2][col] &&
-                        board[row][col] == board[row+3][col])
+                if (board[col][row] != 0 &&
+                        board[col][row] == board[col][row+1] &&
+                        board[col][row] == board[col][row+2] &&
+                        board[col][row] == board[col][row+3])
                 {
                     win = true;
+
+                    // Marca a vitoria
+                    Drawable bgWin;
+                    if (board[col][row] == 1) {
+                        bgWin = bgRedDark;
+                    } else {
+                        bgWin = bgYellowDark;
+                    }
+
+                    boardBtn[col][row].setBackground(bgWin);
+                    boardBtn[col][row+1].setBackground(bgWin);
+                    boardBtn[col][row+2].setBackground(bgWin);
+                    boardBtn[col][row+3].setBackground(bgWin);
                 }
             }
         }
@@ -450,12 +495,25 @@ public class GameActivity extends AppCompatActivity {
         {
             for (int col = 0;col<4;col++)
             {
-                if (board[row][col] != 0 &&
-                        board[row][col] == board[row-1][col+1] &&
-                        board[row][col] == board[row-2][col+2] &&
-                        board[row][col] == board[row-3][col+3])
+                if (board[col][row] != 0 &&
+                        board[col][row] == board[col+1][row-1] &&
+                        board[col][row] == board[col+2][row-2] &&
+                        board[col][row] == board[col+3][row-3])
                 {
                     win = true;
+
+                    // Marca a vitoria
+                    Drawable bgWin;
+                    if (board[col][row] == 1) {
+                        bgWin = bgRedDark;
+                    } else {
+                        bgWin = bgYellowDark;
+                    }
+
+                    boardBtn[col][row].setBackground(bgWin);
+                    boardBtn[col+1][row-1].setBackground(bgWin);
+                    boardBtn[col+2][row-2].setBackground(bgWin);
+                    boardBtn[col+3][row-3].setBackground(bgWin);
                 }
             }
         }
@@ -464,20 +522,29 @@ public class GameActivity extends AppCompatActivity {
         {
             for (int col = 0;col<4;col++)
             {
-                if (board[row][col] != 0 &&
-                        board[row][col] == board[row+1][col+1] &&
-                        board[row][col] == board[row+2][col+2] &&
-                        board[row][col] == board[row+3][col+3])
+                if (board[col][row] != 0 &&
+                        board[col][row] == board[col+1][row+1] &&
+                        board[col][row] == board[col+2][row+2] &&
+                        board[col][row] == board[col+3][row+3])
                 {
                     win = true;
+
+                    // Marca a vitoria
+                    Drawable bgWin;
+                    if (board[col][row] == 1) {
+                        bgWin = bgRedDark;
+                    } else {
+                        bgWin = bgYellowDark;
+                    }
+
+                    boardBtn[col][row].setBackground(bgWin);
+                    boardBtn[col+1][row+1].setBackground(bgWin);
+                    boardBtn[col+2][row+2].setBackground(bgWin);
+                    boardBtn[col+3][row+3].setBackground(bgWin);
                 }
             }
         }
         return win;
-    }
-
-    public void setGrid(int[][] board) {
-        this.board = board;
     }
 
     public int drop(int col) {
@@ -492,9 +559,5 @@ public class GameActivity extends AppCompatActivity {
         }
 
         return 0;
-    }
-
-    public int getPlayer() {
-        return playerAtual;
     }
 }

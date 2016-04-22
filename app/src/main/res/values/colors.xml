@@ -8,7 +8,9 @@
     <color name="colorBlueDark">#2c3e50</color>
     <color name="colorBlueDark2">#ecf0f1</color>
     <color name="colorRed">#e74c3c</color>
+    <color name="colorRedDark">#c0392b</color>
     <color name="colorYellow">#f1c40f</color>
+    <color name="colorYellowDark">#a6870a</color>
     <color name="colorTransparent">#00ffffff</color>
 
 </resources>

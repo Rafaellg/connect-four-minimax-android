@@ -1,48 +1,28 @@
-package puc.connectfour; /**
- * Minimax.java
- *
- *
- *  Computer calculates the best move by looking ahead by a specified
- * number of moves.
- *
- * color 1 wants to take the highest of its recursive generated values,
- *	but return the lowest.
- * color -1 wants to take the lowest of its recursive generated values,
- *	but return the highest.
- *
- *
- */
+package puc.connectfour;
 
-import android.view.View;
-import android.widget.Toast;
-
-import java.util.*;
-
-//Create Minimax object from root node
+//Cria um objeto minimax a partir do no raiz
 public class Minimax
 {
-	private int[][] grid = new int[6][7];
+	private int[][] board = new int[7][6];
 	private int maxDepth;
-    private GameActivity gameActivity;
 
-	//Copy grid from given game grid, set max depth;
-	// If maxDepth is set higher, game is harder
-	public Minimax(int[][] game,int depth, GameActivity gameActivity)
+	// Copia a board recebida
+	// Se maxDepth é maior, jogo é mais difícil
+	public Minimax(int[][] game,int depth)
 	{
-    	grid = copyGrid(game);
+    	board = copyGrid(game);
     	maxDepth = depth;
-        this.gameActivity = gameActivity;
 	}
 
-	//Function to copy grid.
+	// Funcao para copiar a board
 	private int[][] copyGrid(int[][]copy)
 	{
-		int[][] newgrid = new int [6][7];
+		int[][] newgrid = new int [7][6];
 		for (int row =0; row<6; row++)
     	{
     		for (int col=0; col<7; col++)
     		{
-    			newgrid[row][col]=copy[row][col];
+    			newgrid[col][row]=copy[col][row];
     		}
     	}
     	return newgrid;
@@ -59,7 +39,7 @@ public class Minimax
     	{
     		for (int col=0; col<7; col++)
     		{
-    			if (grid[row][col]==1)
+    			if (board[col][row]==1)
     			{
     				count++;
     			}
@@ -67,11 +47,11 @@ public class Minimax
     	}
 		if (count ==1)
 		{
-			if (grid[5][2]==1)
+			if (board[2][5]==1)
 			{
 				return 4;
 			}
-			else if (grid[5][4]==1)
+			else if (board[4][5]==1)
 			{
 				return 2;
 			}
@@ -82,12 +62,12 @@ public class Minimax
 		}
 
 
-		// If not first turn, return negamax
-		return negamax(grid,-1000000,0,1);
+		// If not first turn, return max
+		return max(board,-1000000,0,1);
 	}
 
 	//Recursively calls itself and returns the best col that computer should choose.
-	private int negamax(int[][] game, int alpha, int depth, int color)
+	private int max(int[][] game, int alpha, int depth, int color)
 	{
 		int bestPath = 0;
 		int bestValue = alpha;
@@ -103,27 +83,24 @@ public class Minimax
 		{
 			player = 1;
 		}
-
-//        GameActivity cfm = GameActivity.getInstance();
-//		ConnectFourModel cfm = new ConnectFourModel();
-        gameActivity.setGrid(newGrid);
+		ConnectFourModel cfm = new ConnectFourModel();
+		cfm.setGrid(newGrid,player);
 
 		//Determine if game is over in current state;
 		// return 1000000 if comp win; else return -1000000
-		if (gameActivity.win())
+		if (cfm.win())
 		{
-			if (gameActivity.getPlayer() == 1)
+			if (cfm.getPlayer() == 1)
 			{bestValue = color*(1000000-depth);}
 			else
 			{bestValue = color*(-1000000+depth);}
 		}
 		//Determine if game is a draw
 
-        //TODO arrumar essa linha do empate! ----------------------------------------------------------------------------------
-//		else if(cfm.full()==true&&cfm.win()==false)
-//		{
-//			bestValue = 0;
-//		}
+		else if(cfm.full()==true&&cfm.win()==false)
+		{
+			bestValue = 0;
+		}
 		//Determine pathValue using eval() if depth is reached.
 		else if (depth==maxDepth)
 		{
@@ -138,8 +115,6 @@ public class Minimax
 			}
 		}
 
-
-
 		else
 		{
 			//Generate moves for each col and find the
@@ -147,27 +122,25 @@ public class Minimax
 			for(int c=0;c<7;c++)
 			{
 
-				//Create a cfm for this column and attempt to dropOnCopy.
-//				ConnectFourModel newcfm = new ConnectFourModel();
-//				GameActivity newcfm = GameActivity.getInstance();
-                //gameActivity.setGrid(newGrid);
-				int r = drop(c);
+				//Create a cfm for this column and attempt to drop.
+				ConnectFourModel newcfm = new ConnectFourModel();
+				newcfm.setGrid(newGrid,player);
+				int r = newcfm.drop(c);
 
-				//Recursive call the generated game grid and compare the current value to move value
+				//Recursive call the generated game board and compare the current value to move value
 				// If move is higher, make it the new current value.
 
-				//If dropOnCopy is successful
+				//If drop is successful
 				if (r!=-1)
 				{
-					int[][] nGrid = new int[6][7];
-
+					int[][] nGrid = new int[7][6];
 
 					// Only if depth is < maxDepth recursive call
 					if (depth < maxDepth)
 					{
 					nGrid = copyGrid(newGrid);
-					nGrid[r][c] = player;
-					int v = -negamax(nGrid,-1000000,depth+1,color*-1);
+					nGrid[c][r] = player;
+					int v = -max(nGrid,-1000000,depth+1,color*-1);
 					if (v >=bestValue)
 					{
 						bestPath = c;
@@ -179,30 +152,15 @@ public class Minimax
 		}
 		if (depth==0)
 		{
-			//System.out.println("Turn end");
 			return bestPath;
 		}
 		else
 		{
-			//System.out.println(bestValue);
 			return bestValue;
 		}
 
 	}
 
-	//Evaluates the current board based on current player and returns a value based on how good
-	// current position is.
-	// Neutral is given a score of 0.
-	// 2 in a row is 10. (00__) or (0_0_) or (0__0) or (_0_0) or (__00)
-	// Open-ended 2-in-a-row is 20. (_00_)
-	// 3 in a row is 1000. (00_0) or (0_00) or (000_) or (_000)
-	// Open-ended 3-in-a-row is 2000 (_000_).
-	// return sum of these values.
-
-	//Modifier
-	// Vertical = *1
-	// Diagonal = *2
-	// Horizontal = *3
 	private int eval(int[][] board,int player)
 	{
 		int v = 1;
@@ -219,50 +177,50 @@ public class Minimax
     		for (int col = 0;col<4;col++)
     		{
     			//(xx00)
-    			if (board[row][col] == player &&
-    				board[row][col] == board[row][col+1] &&
-    				board[row][col+2] == 0 &&
-    				board[row][col+3] == 0)
+    			if (board[col][row] == player &&
+    				board[col][row] == board[col+1][row] &&
+    				board[col+2][row] == 0 &&
+    				board[col+3][row] == 0)
     				{
     					val+= twoIn*h;
     				}
     			//(x0x0)
-    			else if (board[row][col] == player &&
-    				board[row][col+2] == player &&
-    				board[row][col+1] == 0 &&
-    				board[row][col+3] == 0)
+    			else if (board[col][row] == player &&
+    				board[col+2][row] == player &&
+    				board[col+1][row] == 0 &&
+    				board[col+3][row] == 0)
     				{
     					val+= twoIn*h;
     				}
     			//(x00x)
-    			else if (board[row][col] == player &&
-    				board[row][col+3] == player &&
-    				board[row][col+1] == 0 &&
-    				board[row][col+2] == 0)
+    			else if (board[col][row] == player &&
+    				board[col+3][row] == player &&
+    				board[col+1][row] == 0 &&
+    				board[col+2][row] == 0)
     				{
     					val+= twoIn*h;
     				}
     			//(0xx0)
-    			else if (board[row][col] == 0 &&
-    				board[row][col+1] == player &&
-    				board[row][col+2] == player &&
-    				board[row][col+3] == 0)
+    			else if (board[col][row] == 0 &&
+    				board[col+1][row] == player &&
+    				board[col+2][row] == player &&
+    				board[col+3][row] == 0)
     				{
     					val+= 2*twoIn*h;
     				}
     			//(0x0x)
-    			else if (board[row][col] == 0 &&
-    				board[row][col+1] == player &&
-    				board[row][col+2] == 0 &&
-    				board[row][col+3] == player)
+    			else if (board[col][row] == 0 &&
+    				board[col+1][row] == player &&
+    				board[col+2][row] == 0 &&
+    				board[col+3][row] == player)
     				{
     					val+= twoIn*h;
     				}
     			//(00xx)
-    			else if (board[row][col] == 0 &&
-    				board[row][col] == board[row][col+1] &&
-    				board[row][col+2] == player &&
-    				board[row][col+3] == player)
+    			else if (board[col][row] == 0 &&
+    				board[col][row] == board[col+1][row] &&
+    				board[col+2][row] == player &&
+    				board[col+3][row] == player)
     				{
     					val+= twoIn*h;
     				}
@@ -278,9 +236,9 @@ public class Minimax
     	{
     		for (int col = 0;col<7;col++)
     		{
-    			if (board[row][col] == player &&
-    				board[row][col] == board[row-1][col] &&
-    				board[row-2][col] == 0)
+    			if (board[col][row] == player &&
+    				board[col][row] == board[col][row-1] &&
+    				board[col][row-2] == 0)
     				{
     					val+= twoIn*v;
     				}
@@ -295,45 +253,45 @@ public class Minimax
     	{
     		for (int col = 0;col<4;col++)
     		{
-    			if (board[row][col] == player &&
-    				board[row][col] == board[row-1][col+1] &&
-    				board[row-2][col+2] == 0 &&
-    				board[row-3][col+3] == 0)
+    			if (board[col][row] == player &&
+    				board[col][row] == board[col+1][row-1] &&
+    				board[col+2][row-2] == 0 &&
+    				board[col+3][row-3] == 0)
     				{
     					val+= twoIn*d;
     				}
-    			else if (board[row][col] == player &&
-    				board[row-1][col+1] == 0 &&
-    				board[row-2][col+2] == 0 &&
-    				board[row][col] == board[row-3][col+3])
+    			else if (board[col][row] == player &&
+    				board[col+1][row-1] == 0 &&
+    				board[col+2][row-2] == 0 &&
+    				board[col][row] == board[col+3][row-3])
     				{
     					val+= twoIn*d;
     				}
-    			else if (board[row][col] == 0 &&
-    				board[row-1][col+1] == 0 &&
-    				board[row-2][col+2] == player &&
-    				board[row-3][col+3] == player)
+    			else if (board[col][row] == 0 &&
+    				board[col+1][row-1] == 0 &&
+    				board[col+2][row-2] == player &&
+    				board[col+3][row-3] == player)
     				{
     					val+= twoIn*d;
     				}
-    			else if (board[row][col] == 0 &&
-    				board[row-1][col+1] == player &&
-    				board[row][col] == board[row-2][col+2] &&
-    				board[row-1][col+1] == board[row-3][col+3])
+    			else if (board[col][row] == 0 &&
+    				board[col+1][row-1] == player &&
+    				board[col][row] == board[col+2][row-2] &&
+    				board[col+1][row-1] == board[col+3][row-3])
     				{
     					val+= twoIn*d;
     				}
-    			else if (board[row][col] == player &&
-    				board[row-1][col+1] == 0 &&
-    				board[row][col] == board[row-2][col+2] &&
-    				board[row-1][col+1] == board[row-3][col+3])
+    			else if (board[col][row] == player &&
+    				board[col+1][row-1] == 0 &&
+    				board[col][row] == board[col+2][row-2] &&
+    				board[col+1][row-1] == board[col+3][row-3])
     				{
     					val+= twoIn*d;
     				}
-    			else if (board[row][col] == 0 &&
-    				board[row-1][col+1] == player &&
-    				board[row-1][col+1] == board[row-2][col+2] &&
-    				board[row][col] == board[row-3][col+3])
+    			else if (board[col][row] == 0 &&
+    				board[col+1][row-1] == player &&
+    				board[col+1][row-1] == board[col+2][row-2] &&
+    				board[col][row] == board[col+3][row-3])
     				{
     					val+= 2*twoIn*d;
     				}
@@ -348,45 +306,45 @@ public class Minimax
     	{
     		for (int col = 0;col<4;col++)
     		{
-    			if (board[row][col] == player &&
-    				board[row][col] == board[row+1][col+1] &&
-    				board[row+2][col+2] == 0 &&
-    				board[row+3][col+3] == 0)
+    			if (board[col][row] == player &&
+    				board[col][row] == board[col+1][row+1] &&
+    				board[col+2][row+2] == 0 &&
+    				board[col+3][row+3] == 0)
     				{
     					val+= twoIn*d;
     				}
-    			else if (board[row][col] == player &&
-    				board[row+1][col+1] == 0 &&
-    				board[row+2][col+2] == 0 &&
-    				board[row][col] == board[row+3][col+3])
+    			else if (board[col][row] == player &&
+    				board[col+1][row+1] == 0 &&
+    				board[col+2][row+2] == 0 &&
+    				board[col][row] == board[col+3][row+3])
     				{
     					val+= twoIn*d;
     				}
-    			else if (board[row][col] == 0 &&
-    				board[row+1][col+1] == 0 &&
-    				board[row+2][col+2] == player &&
-    				board[row+3][col+3] == player)
+    			else if (board[col][row] == 0 &&
+    				board[col+1][row+1] == 0 &&
+    				board[col+2][row+2] == player &&
+    				board[col+3][row+3] == player)
     				{
     					val+= twoIn*d;
     				}
-    			else if (board[row][col] == 0 &&
-    				board[row+1][col+1] == player &&
-    				board[row][col] == board[row+2][col+2] &&
-    				board[row+1][col+1] == board[row+3][col+3])
+    			else if (board[col][row] == 0 &&
+    				board[col+1][row+1] == player &&
+    				board[col][row] == board[col+2][row+2] &&
+    				board[col+1][row+1] == board[col+3][row+3])
     				{
     					val+= twoIn*d;
     				}
-    			else if (board[row][col] == player &&
-    				board[row+1][col+1] == 0 &&
-    				board[row][col] == board[row+2][col+2] &&
-    				board[row+1][col+1] == board[row+3][col+3])
+    			else if (board[col][row] == player &&
+    				board[col+1][row+1] == 0 &&
+    				board[col][row] == board[col+2][row+2] &&
+    				board[col+1][row+1] == board[col+3][row+3])
     				{
     					val+= twoIn*d;
     				}
-    			else if (board[row][col] == 0 &&
-    				board[row+1][col+1] == player &&
-    				board[row+1][col+1] == board[row+2][col+2] &&
-    				board[row][col] == board[row+3][col+3])
+    			else if (board[col][row] == 0 &&
+    				board[col+1][row+1] == player &&
+    				board[col+1][row+1] == board[col+2][row+2] &&
+    				board[col][row] == board[col+3][row+3])
     				{
     					val+= twoIn*2*d;
     				}
@@ -398,34 +356,34 @@ public class Minimax
     		for (int col = 0;col<4;col++)
     		{
     			//(xx0x)
-    			if (board[row][col] == player &&
-    				board[row][col] == board[row][col+1] &&
-    				board[row][col+2] == 0 &&
-    				board[row][col] == board[row][col+3])
+    			if (board[col][row] == player &&
+    				board[col][row] == board[col+1][row] &&
+    				board[col+2][row] == 0 &&
+    				board[col][row] == board[col+3][row])
     				{
     					val+= threeIn*h;
     				}
     			//(x0xx)
-    			else if (board[row][col] == player &&
-    				board[row][col+1] == 0 &&
-    				board[row][col] == board[row][col+2] &&
-    				board[row][col] == board[row][col+3])
+    			else if (board[col][row] == player &&
+    				board[col+1][row] == 0 &&
+    				board[col][row] == board[col+2][row] &&
+    				board[col][row] == board[col+3][row])
     				{
     					val+= threeIn*h;
     				}
     			//(0xxx)
-    			else if (board[row][col] == 0 &&
-    				board[row][col+1] == player &&
-                    board[row][col+1] == board[row][col+2] &&
-                    board[row][col+1] == board[row][col+3])
+    			else if (board[col][row] == 0 &&
+    				board[col+1][row] == player &&
+    				board[col+1][row] == board[col+2][row] &&
+    				board[col+1][row] == board[col+3][row])
     				{
     					val+= threeIn*h;
     				}
     			//(xxx0)
-    			else if (board[row][col] == player &&
-    				board[row][col] == board[row][col+1] &&
-    				board[row][col] == board[row][col+2] &&
-    				board[row][col+3] == 0)
+    			else if (board[col][row] == player &&
+    				board[col][row] == board[col+1][row] &&
+    				board[col][row] == board[col+2][row] &&
+    				board[col+3][row] == 0)
     				{
     					val+= threeIn*h;
     				}
@@ -441,10 +399,10 @@ public class Minimax
     	{
     		for (int col = 0;col<7;col++)
     		{
-    			if (board[row][col] == player &&
-    				board[row][col] == board[row-1][col] &&
-    				board[row][col] == board[row-2][col] &&
-    				board[row-3][col] == 0)
+    			if (board[col][row] == player &&
+    				board[col][row] == board[col][row-1] &&
+    				board[col][row] == board[col][row-2] &&
+    				board[col][row-3] == 0)
     				{
     					val+= threeIn*v;
     				}
@@ -459,31 +417,31 @@ public class Minimax
     	{
     		for (int col = 0;col<4;col++)
     		{
-    			if (board[row][col] == player &&
-    				board[row][col] == board[row-1][col+1] &&
-    				board[row][col] == board[row-2][col+2] &&
-    				board[row-3][col+3] == 0)
+    			if (board[col][row] == player &&
+    				board[col][row] == board[col+1][row-1] &&
+    				board[col][row] == board[col+2][row-2] &&
+    				board[col+3][row-3] == 0)
     				{
     					val+= threeIn*d;
     				}
-    			else if (board[row][col] == player &&
-    				board[row][col] == board[row-1][col+1] &&
-    				board[row-2][col+2] == 0 &&
-    				board[row][col] == board[row-3][col+3])
+    			else if (board[col][row] == player &&
+    				board[col][row] == board[col+1][row-1] &&
+    				board[col+2][row-2] == 0 &&
+    				board[col][row] == board[col+3][row-3])
     				{
     					val+= threeIn*d;
     				}
-    			else if (board[row][col] == player &&
-    				board[row-1][col+1] == 0 &&
-    				board[row][col] == board[row-2][col+2] &&
-    				board[row][col] == board[row-3][col+3])
+    			else if (board[col][row] == player &&
+    				board[col+1][row-1] == 0 &&
+    				board[col][row] == board[col+2][row-2] &&
+    				board[col][row] == board[col+3][row-3])
     				{
     					val+= threeIn*d;
     				}
-    			else if (board[row][col] == 0 &&
-    				board[row-1][col+1] == player &&
-    				board[row-1][col+1] == board[row-2][col+2] &&
-    				board[row-1][col+1] == board[row-3][col+3])
+    			else if (board[col][row] == 0 &&
+    				board[col+1][row-1] == player &&
+    				board[col+1][row-1] == board[col+2][row-2] &&
+    				board[col+1][row-1] == board[col+3][row-3])
     				{
     					val+= threeIn*d;
     				}
@@ -498,31 +456,31 @@ public class Minimax
     	{
     		for (int col = 0;col<4;col++)
     		{
-    			if (board[row][col] == 0 &&
-    				board[row+1][col+1] == player &&
-    				board[row+1][col+1] == board[row+2][col+2] &&
-    				board[row+1][col+1] == board[row+3][col+3])
+    			if (board[col][row] == 0 &&
+    				board[col+1][row+1] == player &&
+    				board[col+1][row+1] == board[col+2][row+2] &&
+    				board[col+1][row+1] == board[col+3][row+3])
     				{
     					val+= threeIn*d;
     				}
-    			else if (board[row][col] == player &&
-    				board[row+1][col+1] == 0 &&
-    				board[row][col] == board[row+2][col+2] &&
-    				board[row][col] == board[row+3][col+3])
+    			else if (board[col][row] == player &&
+    				board[col+1][row+1] == 0 &&
+    				board[col][row] == board[col+2][row+2] &&
+    				board[col][row] == board[col+3][row+3])
     				{
     					val+= threeIn*d;
     				}
-    			else if (board[row][col] == player &&
-    				board[row][col] == board[row+1][col+1] &&
-    				board[row+2][col+2] == 0 &&
-    				board[row][col] == board[row+3][col+3])
+    			else if (board[col][row] == player &&
+    				board[col][row] == board[col+1][row+1] &&
+    				board[col+2][row+2] == 0 &&
+    				board[col][row] == board[col+3][row+3])
     				{
     					val+= threeIn*d;
     				}
-    			else if (board[row][col] == player &&
-    				board[row][col] == board[row+1][col+1] &&
-    				board[row][col] == board[row+2][col+2] &&
-    				board[row+3][col+3] == 0)
+    			else if (board[col][row] == player &&
+    				board[col][row] == board[col+1][row+1] &&
+    				board[col][row] == board[col+2][row+2] &&
+    				board[col+3][row+3] == 0)
     				{
     					val+= threeIn*d;
     				}
@@ -535,11 +493,11 @@ public class Minimax
     		for (int col = 0;col<3;col++)
     		{
     			//horizontal
-    			if (board[row][col] == 0 &&
-    				board[row][col+1] == player &&
-    				board[row][col+2] == player &&
-    				board[row][col+3] == player &&
-    				board[row][col] == board[row][col+4])
+    			if (board[col][row] == 0 &&
+    				board[col+1][row] == player &&
+    				board[col+2][row] == player &&
+    				board[col+3][row] == player &&
+    				board[col][row] == board[col+4][row])
     				{
     					val+= 2*threeIn*h;
     				}
@@ -550,11 +508,11 @@ public class Minimax
     		for (int col = 0;col<3;col++)
     		{
     			//diag(\)
-    			if (board[row][col] == 0 &&
-    				board[row+1][col+1] == player &&
-    				board[row][col] == board[row+2][col+2] &&
-    				board[row][col] == board[row+3][col+3] &&
-    				board[row+4][col+4] == 0)
+    			if (board[col][row] == 0 &&
+    				board[col+1][row+1] == player &&
+    				board[col][row] == board[col+2][row+2] &&
+    				board[col][row] == board[col+3][row+3] &&
+    				board[col+4][row+4] == 0)
     				{
     					val+= 2*threeIn*d;
     				}
@@ -565,11 +523,11 @@ public class Minimax
     		{
     			for (int col = 0;col<3;col++)
     			{
-    				if (board[row][col] == 0 &&
-    					board[row-1][col+1] == player &&
-    					board[row-2][col+2] == player &&
-    					board[row-3][col+3] == player &&
-    					board[row-4][col+4] == 0)
+    				if (board[col][row] == 0 &&
+    					board[col+1][row-1] == player &&
+    					board[col+2][row-2] == player &&
+    					board[col+3][row-3] == player &&
+    					board[col+4][row-4] == 0)
     					{
     						val+= 2*threeIn*d;
     					}
@@ -578,22 +536,6 @@ public class Minimax
     	return val;
 	}
 
-    public int drop(int col) {
-        for (int i = 5; i >= 0; i--) {
-            if (grid[i][col] == 0) {
-                grid[i][col] = 2;
-
-                // Sai do for
-                i = -1;
-            }
-        }
-
-        if (GameActivity.getInstance().win()) {
-            return -1;
-        }
-
-        return 3;
-    }
 }
 
 
