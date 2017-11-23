@@ -287,7 +287,7 @@ public class GameActivity extends AppCompatActivity {
             }
 
             // Troca o jogador atual
-            playerAtual = (playerAtual%2)+1;
+            playerAtual = (playerAtual % 2) + 1;
             return true;
         } else {
             Toast.makeText(this, "Coluna cheia!", Toast.LENGTH_SHORT).show();
@@ -335,7 +335,7 @@ public class GameActivity extends AppCompatActivity {
                 boolean success = moveDown();
 
                 // Faz o movimento do minimax
-                if (success){
+                if (success) {
                     if (alfaBeta) {
                         minimaxAlfaBetaPlay();
                     } else {
@@ -351,14 +351,14 @@ public class GameActivity extends AppCompatActivity {
 
     public void minimaxPlay() {
         int[][] newBoard = board.clone();
-        Minimax comp = new Minimax(newBoard,4);
+        Minimax comp = new Minimax(newBoard, 4);
         int c = comp.calcValue();
         drop(c);
     }
 
     public void minimaxAlfaBetaPlay() {
         int[][] newBoard = board.clone();
-        MinimaxAlfaBeta comp = new MinimaxAlfaBeta(newBoard,4);
+        MinimaxAlfaBeta comp = new MinimaxAlfaBeta(newBoard, 4);
         int c = comp.calcValue();
         drop(c);
     }
@@ -437,15 +437,12 @@ public class GameActivity extends AppCompatActivity {
     public boolean win() {
         boolean win = false;
         //Check for horizontal win
-        for (int row=0;row<6;row++)
-        {
-            for (int col = 0;col<4;col++)
-            {
+        for (int row = 0; row < 6; row++) {
+            for (int col = 0; col < 4; col++) {
                 if (board[col][row] != 0 &&
-                        board[col][row] == board[col+1][row] &&
-                        board[col][row] == board[col+2][row] &&
-                        board[col][row] == board[col+3][row])
-                {
+                        board[col][row] == board[col + 1][row] &&
+                        board[col][row] == board[col + 2][row] &&
+                        board[col][row] == board[col + 3][row]) {
                     win = true;
 
                     // Marca a vitoria
@@ -457,22 +454,19 @@ public class GameActivity extends AppCompatActivity {
                     }
 
                     boardBtn[col][row].setBackground(bgWin);
-                    boardBtn[col+1][row].setBackground(bgWin);
-                    boardBtn[col+2][row].setBackground(bgWin);
-                    boardBtn[col+3][row].setBackground(bgWin);
+                    boardBtn[col + 1][row].setBackground(bgWin);
+                    boardBtn[col + 2][row].setBackground(bgWin);
+                    boardBtn[col + 3][row].setBackground(bgWin);
                 }
             }
         }
         //Check for vertical win
-        for (int row=0;row<3;row++)
-        {
-            for (int col = 0;col<7;col++)
-            {
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 7; col++) {
                 if (board[col][row] != 0 &&
-                        board[col][row] == board[col][row+1] &&
-                        board[col][row] == board[col][row+2] &&
-                        board[col][row] == board[col][row+3])
-                {
+                        board[col][row] == board[col][row + 1] &&
+                        board[col][row] == board[col][row + 2] &&
+                        board[col][row] == board[col][row + 3]) {
                     win = true;
 
                     // Marca a vitoria
@@ -484,22 +478,19 @@ public class GameActivity extends AppCompatActivity {
                     }
 
                     boardBtn[col][row].setBackground(bgWin);
-                    boardBtn[col][row+1].setBackground(bgWin);
-                    boardBtn[col][row+2].setBackground(bgWin);
-                    boardBtn[col][row+3].setBackground(bgWin);
+                    boardBtn[col][row + 1].setBackground(bgWin);
+                    boardBtn[col][row + 2].setBackground(bgWin);
+                    boardBtn[col][row + 3].setBackground(bgWin);
                 }
             }
         }
         //Check for diagonal win (/)
-        for (int row=5;row>2;row--)
-        {
-            for (int col = 0;col<4;col++)
-            {
+        for (int row = 5; row > 2; row--) {
+            for (int col = 0; col < 4; col++) {
                 if (board[col][row] != 0 &&
-                        board[col][row] == board[col+1][row-1] &&
-                        board[col][row] == board[col+2][row-2] &&
-                        board[col][row] == board[col+3][row-3])
-                {
+                        board[col][row] == board[col + 1][row - 1] &&
+                        board[col][row] == board[col + 2][row - 2] &&
+                        board[col][row] == board[col + 3][row - 3]) {
                     win = true;
 
                     // Marca a vitoria
@@ -511,22 +502,19 @@ public class GameActivity extends AppCompatActivity {
                     }
 
                     boardBtn[col][row].setBackground(bgWin);
-                    boardBtn[col+1][row-1].setBackground(bgWin);
-                    boardBtn[col+2][row-2].setBackground(bgWin);
-                    boardBtn[col+3][row-3].setBackground(bgWin);
+                    boardBtn[col + 1][row - 1].setBackground(bgWin);
+                    boardBtn[col + 2][row - 2].setBackground(bgWin);
+                    boardBtn[col + 3][row - 3].setBackground(bgWin);
                 }
             }
         }
         //Check for diagonal win (\)
-        for (int row=0;row<3;row++)
-        {
-            for (int col = 0;col<4;col++)
-            {
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 4; col++) {
                 if (board[col][row] != 0 &&
-                        board[col][row] == board[col+1][row+1] &&
-                        board[col][row] == board[col+2][row+2] &&
-                        board[col][row] == board[col+3][row+3])
-                {
+                        board[col][row] == board[col + 1][row + 1] &&
+                        board[col][row] == board[col + 2][row + 2] &&
+                        board[col][row] == board[col + 3][row + 3]) {
                     win = true;
 
                     // Marca a vitoria
@@ -538,9 +526,9 @@ public class GameActivity extends AppCompatActivity {
                     }
 
                     boardBtn[col][row].setBackground(bgWin);
-                    boardBtn[col+1][row+1].setBackground(bgWin);
-                    boardBtn[col+2][row+2].setBackground(bgWin);
-                    boardBtn[col+3][row+3].setBackground(bgWin);
+                    boardBtn[col + 1][row + 1].setBackground(bgWin);
+                    boardBtn[col + 2][row + 2].setBackground(bgWin);
+                    boardBtn[col + 3][row + 3].setBackground(bgWin);
                 }
             }
         }
